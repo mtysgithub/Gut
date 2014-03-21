@@ -4,6 +4,7 @@
 #include "Gut.h"
 #include "GUtWin32.h"
 
+static bool g_bMsgLoopActive = false;
 static HWND g_hWnd = NULL;
 static HINSTANCE g_hInstance = NULL;
 static HANDLE g_ThreadHandle = NULL;
@@ -41,29 +42,34 @@ void GutGetMouseState(int &x, int &y, int button[3])
 
 	GetCursorPos(&p);
 	ScreenToClient(g_hWnd, &p);
-	
+
 	x = p.x;
 	y = p.y;
-	
+
 	button[0] = GetKeyState(VK_LBUTTON) & 0x80 ? 1 : 0;
 	button[1] = GetKeyState(VK_MBUTTON) & 0x80 ? 1 : 0;
 	button[2] = GetKeyState(VK_RBUTTON) & 0x80 ? 1 : 0;
 }
 
-// `´°¿ÚĞÅÏ¢´¦Àíº¯Êı`
+// `çª—å£ä¿¡æ¯å¤„ç†å‡½æ•°`
 static LRESULT WINAPI WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	// `¼ì²éĞÅÏ¢ÖÖÀà`
+	// `æ£€æŸ¥ä¿¡æ¯ç§ç±»`
 	switch (message)
 	{
-		case WM_DESTROY:
+	case WM_DESTROY:
 		{
-			// `Èç¹û´°¿Ú±»¹ØµôÁË, ¾ÍÖ÷¶¯·¢³ö³ÌĞò¸Ã½áÊøµÄĞÅÏ¢.`
-			PostQuitMessage(0);
+			/*
+			è€ƒè™‘åˆ°æŸäº›OpenGLç¨‹åºå¯èƒ½è¢«ä½œä¸ºæŸäº›å›¾å½¢å¼•æ“çš„å¤–æŒ‚æ’ä»¶ï¼Œå›ºæ­¤æ—¶å¦‚æœå‘é€PostQuitMessageæ¶ˆæ¯å°†æ„å‘³ç€é‡Šæ”¾æ•´ä¸ªè¿›ç¨‹ç©ºé—´ï¼Œ
+			å¯¼è‡´ä¸»ä½“ç¨‹åºå´©æºƒ.   by _mTy 2014.03.21
+			*/
+			//PostQuitMessage(0);
+
+			g_bMsgLoopActive = false;
 			break;
 		}
 
-		case WM_SIZE: // `´°¿Ú´óĞ¡±»¸Ä±ä`
+	case WM_SIZE: // `çª—å£å¤§å°è¢«æ”¹å˜`
 		{
 			int w = LOWORD(lParam);
 			int h = HIWORD(lParam);
@@ -71,26 +77,26 @@ static LRESULT WINAPI WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
 			g_iWindowHeight = h;
 			if ( g_GutCallBack.OnSize && GutGetGraphicsDeviceType()!=GUT_UNKNOWN ) 
 			{
-				// `ÓĞÉèÖÃ´°¿Ú´óĞ¡¸Ä±äµÄ´¦Àíº¯ÊıµÄ»°, ¾ÍÈ¥µ÷ÓÃËü.`
+				// `æœ‰è®¾ç½®çª—å£å¤§å°æ”¹å˜çš„å¤„ç†å‡½æ•°çš„è¯, å°±å»è°ƒç”¨å®ƒ.`
 				g_GutCallBack.OnSize(w, h);
 			}
 			break;
 		}
 
-		case WM_PAINT: // `´°¿ÚĞèÒªÖØ»­`
+	case WM_PAINT: // `çª—å£éœ€è¦é‡ç”»`
 		{
 			PAINTSTRUCT ps;
 			BeginPaint(hwnd, &ps);
 			EndPaint(hwnd, &ps);
 			if ( g_GutCallBack.OnPaint )
 			{
-				// `ÓĞÉèÖÃÖØ»æĞÅÏ¢´¦Àíº¯ÊıµÄ»°, ¾ÍÈ¥µ÷ÓÃËü.`
+				// `æœ‰è®¾ç½®é‡ç»˜ä¿¡æ¯å¤„ç†å‡½æ•°çš„è¯, å°±å»è°ƒç”¨å®ƒ.`
 				g_GutCallBack.OnPaint();
 			}
 			break;
 		}
 
-		default: // `ÆäËüĞÅÏ¢¶¼Ö±½Ó½»¸øÄÚÖÃµÄĞÅÏ¢´¦Àíº¯ÊıÈ¥×ö`
+	default: // `å…¶å®ƒä¿¡æ¯éƒ½ç›´æ¥äº¤ç»™å†…ç½®çš„ä¿¡æ¯å¤„ç†å‡½æ•°å»åš`
 		{
 			return DefWindowProc(hwnd, message, wParam, lParam);
 			break;
@@ -102,26 +108,35 @@ static LRESULT WINAPI WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
 
 void GutCloseWindow(void)
 {
-	PostQuitMessage(0);
+	/*
+	è€ƒè™‘åˆ°æŸäº›OpenGLç¨‹åºå¯èƒ½è¢«ä½œä¸ºæŸäº›å›¾å½¢å¼•æ“çš„å¤–æŒ‚æ’ä»¶ï¼Œå›ºæ­¤æ—¶å¦‚æœå‘é€PostQuitMessageæ¶ˆæ¯å°†æ„å‘³ç€é‡Šæ”¾æ•´ä¸ªè¿›ç¨‹ç©ºé—´ï¼Œ
+	å¯¼è‡´ä¸»ä½“ç¨‹åºå´©æºƒ.   by _mTy 2014.03.21
+	*/
+	//PostQuitMessage(0);
+
+	if (g_hWnd && IsWindow(g_hWnd))
+	{
+		DestroyWindow(g_hWnd);
+	}
 }
 
-// `¼ì²éWindows²Ù×÷ÏµÍ³´«À´µÄĞÅÏ¢`
+// `æ£€æŸ¥Windowsæ“ä½œç³»ç»Ÿä¼ æ¥çš„ä¿¡æ¯`
 bool GutProcessMessage(void)
 {
-	MSG	msg;
-	// `¿´¿´ÊÇ·ñÈÎºÎĞÅÏ¢`
-	if ( PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) )
+	if (false == g_bMsgLoopActive)
 	{
-		// `ÓĞĞÅÏ¢µÄ»°, ¾Í°ÑËüËÍ¸øĞÅÏ¢´¦Àíº¯Êı.`
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-		if ( msg.message==WM_QUIT )
-		{
-			// `ÊÕµ½¹Ø±Õ´°¿ÚµÄĞÅÏ¢»á·µ»ØfalseÀ´½áÊøÑ­»·.`
-			return false;
-		}
+		// `æ”¶åˆ°å…³é—­çª—å£çš„ä¿¡æ¯ä¼šè¿”å›falseæ¥ç»“æŸå¾ªç¯.`
+		return false;
 	}
 
+	MSG	msg;
+	// `çœ‹çœ‹æ˜¯å¦ä»»ä½•ä¿¡æ¯`
+	if ( PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) )
+	{
+		// `æœ‰ä¿¡æ¯çš„è¯, å°±æŠŠå®ƒé€ç»™ä¿¡æ¯å¤„ç†å‡½æ•°.`
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
 	return true;
 }
 
@@ -149,22 +164,22 @@ bool GutFullScreen(int width, int height)
 
 	memset(&window_class, 0, sizeof(WNDCLASS));
 
-	// `ÉèÖÃ´°¿ÚÀàĞÍ`
+	// `è®¾ç½®çª—å£ç±»å‹`
 	window_class.style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
-	// `ÉèÖÃĞÅÏ¢´¦Àíº¯ÊıÎªWndProc`
+	// `è®¾ç½®ä¿¡æ¯å¤„ç†å‡½æ•°ä¸ºWndProc`
 	window_class.lpfnWndProc = WndProc;
-	// `»ñµÃÄ¿Ç°ÔËĞĞµÄ³ÌĞò`
+	// `è·å¾—ç›®å‰è¿è¡Œçš„ç¨‹åº`
 	window_class.hInstance = GetModuleHandle(NULL);
-	// `Ê¹ÓÃÄ¬ÈÏµÄÊó±ê`
+	// `ä½¿ç”¨é»˜è®¤çš„é¼ æ ‡`
 	window_class.hCursor = LoadCursor(NULL, IDC_ARROW);
-	// `±³¾°ÉèÎªºÚÉ«, ÆäÊµÊÇ·ñÉèÖÃÃ»ÓĞÇø±ğ.`
+	// `èƒŒæ™¯è®¾ä¸ºé»‘è‰², å…¶å®æ˜¯å¦è®¾ç½®æ²¡æœ‰åŒºåˆ«.`
 	window_class.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
-	// `¸ø¶¨Ò»¸ö×¢²á´°¿ÚÊ±Ê¹ÓÃµÄÃû×Ö`
+	// `ç»™å®šä¸€ä¸ªæ³¨å†Œçª—å£æ—¶ä½¿ç”¨çš„åå­—`
 	window_class.lpszClassName = title;
-	// `Ïò²Ù×÷ÏµÍ³×¢²áÒ»¸öĞÂµÄ´°¿Ú`
+	// `å‘æ“ä½œç³»ç»Ÿæ³¨å†Œä¸€ä¸ªæ–°çš„çª—å£`
 	if (RegisterClass(&window_class) == 0)
 		return 0;
-	
+
 	DWORD dwExStyle=WS_EX_APPWINDOW;	// Window Extended Style
 	DWORD dwStyle=WS_POPUP;				// Windows Style
 	ShowCursor(FALSE);					// Hide Mouse Pointer
@@ -201,23 +216,24 @@ bool GutFullScreen(int width, int height)
 	if (window_handle == NULL)
 		return false;
 
-	// `¼ÇÂ¼ÏÂÓÃÀ´´ú±í´°¿ÚºÍÄ¿Ç°ÔËĞĞ³ÌĞòµÄ¶ÔÏó, ÒÔºó¿ÉÒÔÔÙÓÃµ½.`
+	// `è®°å½•ä¸‹ç”¨æ¥ä»£è¡¨çª—å£å’Œç›®å‰è¿è¡Œç¨‹åºçš„å¯¹è±¡, ä»¥åå¯ä»¥å†ç”¨åˆ°.`
 	g_hWnd = window_handle;
 	g_hInstance = window_class.hInstance;
-	// `ÏÔÊ¾´°¿Ú`
+	// `æ˜¾ç¤ºçª—å£`
 	ShowWindow(window_handle, SW_SHOWNORMAL);
 	SetActiveWindow(window_handle);
 	SetForegroundWindow(window_handle);	
 	SetFocus(window_handle);
-	
+
+	g_bMsgLoopActive = true;
 	return true;
 }
 
 
-// `´ò¿ª´°¿Ú`
-// `x, y = ´°¿Ú×óÉÏ½ÇµÄÎ»ÖÃ`
-// `width, height = ´°¿Ú´óĞ¡`
-// `title = ´°¿Ú±êÌâÀ¸ËùÏÔÊ¾µÄÎÄ×Ö`
+// `æ‰“å¼€çª—å£`
+// `x, y = çª—å£å·¦ä¸Šè§’çš„ä½ç½®`
+// `width, height = çª—å£å¤§å°`
+// `title = çª—å£æ ‡é¢˜æ æ‰€æ˜¾ç¤ºçš„æ–‡å­—`
 bool GutCreateWindow(int x, int y, int width, int height, const char *title)
 {
 	static bool registered = false;
@@ -226,19 +242,19 @@ bool GutCreateWindow(int x, int y, int width, int height, const char *title)
 
 	memset(&window_class, 0, sizeof(WNDCLASS));
 
-	// `ÉèÖÃ´°¿ÚÀàĞÍ`
+	// `è®¾ç½®çª—å£ç±»å‹`
 	window_class.style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
-	// `ÉèÖÃĞÅÏ¢´¦Àíº¯ÊıÎªWndProc`
+	// `è®¾ç½®ä¿¡æ¯å¤„ç†å‡½æ•°ä¸ºWndProc`
 	window_class.lpfnWndProc = WndProc;
-	// `»ñµÃÄ¿Ç°ÔËĞĞµÄ³ÌĞò`
+	// `è·å¾—ç›®å‰è¿è¡Œçš„ç¨‹åº`
 	window_class.hInstance = GetModuleHandle(NULL);
-	// `Ê¹ÓÃÄ¬ÈÏµÄÊó±ê`
+	// `ä½¿ç”¨é»˜è®¤çš„é¼ æ ‡`
 	window_class.hCursor = LoadCursor(NULL, IDC_ARROW);
-	// `±³¾°ÉèÎªºÚÉ«, ÆäÊµÊÇ·ñÉèÖÃÃ»ÓĞÇø±ğ.`
+	// `èƒŒæ™¯è®¾ä¸ºé»‘è‰², å…¶å®æ˜¯å¦è®¾ç½®æ²¡æœ‰åŒºåˆ«.`
 	window_class.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
-	// `¸ø¶¨Ò»¸ö×¢²á´°¿ÚÊ±Ê¹ÓÃµÄÃû×Ö`
+	// `ç»™å®šä¸€ä¸ªæ³¨å†Œçª—å£æ—¶ä½¿ç”¨çš„åå­—`
 	window_class.lpszClassName = title;
-	// `Ïò²Ù×÷ÏµÍ³×¢²áÒ»¸öĞÂµÄ´°¿Ú`
+	// `å‘æ“ä½œç³»ç»Ÿæ³¨å†Œä¸€ä¸ªæ–°çš„çª—å£`
 	if ( !registered )
 	{
 		if (RegisterClass(&window_class) == 0)
@@ -250,40 +266,40 @@ bool GutCreateWindow(int x, int y, int width, int height, const char *title)
 
 	if ( g_GutCallBack.OnSize )
 	{
-		// `Èç¹ûÓĞ´¦Àí´°¿ÚËõ·ÅµÄĞÅÏ¢, ²ÅÈİĞíÊó±ê¸Ä±ä´°¿Ú´óĞ¡.`
+		// `å¦‚æœæœ‰å¤„ç†çª—å£ç¼©æ”¾çš„ä¿¡æ¯, æ‰å®¹è®¸é¼ æ ‡æ”¹å˜çª—å£å¤§å°.`
 		window_style = WS_OVERLAPPEDWINDOW;
 	}
 	else
 	{
-		// `Èç¹ûÊÇ·ñ´¦Àí´°¿ÚËõ·ÅµÄĞÅÏ¢, ²»ÈİĞíÊó±ê¸Ä±ä´°¿Ú´óĞ¡.`
+		// `å¦‚æœæ˜¯å¦å¤„ç†çª—å£ç¼©æ”¾çš„ä¿¡æ¯, ä¸å®¹è®¸é¼ æ ‡æ”¹å˜çª—å£å¤§å°.`
 		window_style = WS_BORDER | WS_SYSMENU;
 	}
 
 	if ( x<0 || y<0 )
 	{
-		// Ê¹ÓÃÄ¬ÈÏÖµ
+		// ä½¿ç”¨é»˜è®¤å€¼
 		x = g_iWindowPosX;
 		y = g_iWindowPosY;
 	}
 
 	if ( width<0 || height < 0 )
 	{
-		// Ê¹ÓÃÄ¬ÈÏÖµ
+		// ä½¿ç”¨é»˜è®¤å€¼
 		width = g_iWindowWidth;
 		height = g_iWindowHeight;
 	}
 
-	// `¼ÆËã´°¿ÚµÄ±ßÏß»áÕ¼µôµÄµãÊı, ±ØÒªÊ±ÒªÔö¼Ó´°¿Ú´óĞ¡.`
+	// `è®¡ç®—çª—å£çš„è¾¹çº¿ä¼šå æ‰çš„ç‚¹æ•°, å¿…è¦æ—¶è¦å¢åŠ çª—å£å¤§å°.`
 	RECT window_rect;
 	SetRect(&window_rect, x, y, x+width, y+height);
 	AdjustWindowRect(&window_rect, window_style, FALSE);
-	
+
 	g_iWindowPosX = x;
 	g_iWindowPosY = y;
 	g_iWindowWidth = width;
 	g_iWindowHeight = height;
 
-	// `×¼±¸¹¤×÷Íê³É, ´ò¿ªÒ»¸ö´°¿Ú.`
+	// `å‡†å¤‡å·¥ä½œå®Œæˆ, æ‰“å¼€ä¸€ä¸ªçª—å£.`
 	HWND window_handle = CreateWindowEx(
 		WS_EX_APPWINDOW,
 		title,
@@ -302,12 +318,13 @@ bool GutCreateWindow(int x, int y, int width, int height, const char *title)
 	if (window_handle == NULL)
 		return false;
 
-	// `¼ÇÂ¼ÏÂÓÃÀ´´ú±í´°¿ÚºÍÄ¿Ç°ÔËĞĞ³ÌĞòµÄ¶ÔÏó, ÒÔºó¿ÉÒÔÔÙÓÃµ½.`
+	// `è®°å½•ä¸‹ç”¨æ¥ä»£è¡¨çª—å£å’Œç›®å‰è¿è¡Œç¨‹åºçš„å¯¹è±¡, ä»¥åå¯ä»¥å†ç”¨åˆ°.`
 	g_hWnd = window_handle;
 	g_hInstance = window_class.hInstance;
-	// `ÏÔÊ¾´°¿Ú`
+	// `æ˜¾ç¤ºçª—å£`
 	ShowWindow(window_handle, SW_SHOWNORMAL);
 	SetActiveWindow(window_handle);
-	
+
+	g_bMsgLoopActive = true;
 	return true;
 }

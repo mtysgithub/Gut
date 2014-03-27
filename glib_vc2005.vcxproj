@@ -93,10 +93,14 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <AdditionalIncludeDirectories>$(DXSDK_DIR)\Include</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Lib>
       <AdditionalLibraryDirectories>$(DXSDK_DIR)/Lib/x86</AdditionalLibraryDirectories>
     </Lib>
+    <Link>
+      <ModuleDefinitionFile>IExGlobal.def</ModuleDefinitionFile>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -110,6 +114,9 @@
     <Lib>
       <AdditionalLibraryDirectories>$(DXSDK_DIR)/Lib/x86</AdditionalLibraryDirectories>
     </Lib>
+    <Link>
+      <ModuleDefinitionFile>IExGlobal.def</ModuleDefinitionFile>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_DX10|Win32'">
     <ClCompile>
@@ -126,6 +133,9 @@
     <Lib>
       <AdditionalLibraryDirectories>$(DXSDK_DIR)/Lib/x86</AdditionalLibraryDirectories>
     </Lib>
+    <Link>
+      <ModuleDefinitionFile>IExGlobal.def</ModuleDefinitionFile>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_DX10|Win32'">
     <ClCompile>
@@ -139,6 +149,9 @@
     <Lib>
       <AdditionalLibraryDirectories>$(DXSDK_DIR)/Lib/x86</AdditionalLibraryDirectories>
     </Lib>
+    <Link>
+      <ModuleDefinitionFile>IExGlobal.def</ModuleDefinitionFile>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Gut.cpp" />
@@ -190,6 +203,8 @@
     <ClInclude Include="GutModel_DX9.h" />
     <ClInclude Include="GutTexture_DX9.h" />
     <ClInclude Include="FastMath.h" />
+    <ClInclude Include="IExWin32.h" />
+    <ClInclude Include="IGutWin32.h" />
     <ClInclude Include="Matrix4x4.h" />
     <ClInclude Include="Matrix4x4_Reference.h" />
     <ClInclude Include="Matrix4x4_SSE.h" />
@@ -210,7 +225,7 @@
     <ClInclude Include="GutModel_DX10.h" />
     <ClInclude Include="GutTexture_DX10.h" />
     <ClInclude Include="GutTimer.h" />
-    <ClInclude Include="GutWin32.h" />
+    <ClInclude Include="GutWin32.hpp" />
     <ClInclude Include="GutInput.h" />
     <ClInclude Include="GutHeightmap.h" />
     <ClInclude Include="GutModel.h" />
@@ -223,6 +238,9 @@
     <ClInclude Include="GutTGA.h" />
     <ClInclude Include="GutFont.h" />
     <ClInclude Include="GutFontUnicodeWin32.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="IExGlobal.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

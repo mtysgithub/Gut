@@ -5,7 +5,7 @@
 #include <dinput.h>
 
 #include "Gut.h"
-#include "GutWin32.h"
+#include "GutWin32.hpp"
 #include "GutInput.h"
 
 static LPDIRECTINPUT8       g_pDI    = NULL;         

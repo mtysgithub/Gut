@@ -7,7 +7,7 @@
 
 #include "Gut.h"
 #include "GutFontUnicodeWin32.h"
-#include "GutWin32.h"
+#include "GutWin32.hpp"
 
 CGutFontUniCode::CGutFontUniCode(void)
 {

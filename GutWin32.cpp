@@ -1,8 +1,34 @@
-
 #include <windows.h>
-
 #include "Gut.h"
-#include "GUtWin32.h"
+#include "GutWin32.hpp"
+
+#if GUT_WIN32_OO
+
+Gut3DWndMgrWin32 *Gut3DWndMgrWin32::Instance()
+{
+	if(!pGut3DWndMgrWin32)
+	{
+		pGut3DWndMgrWin32 = new Gut3DWndMgrWin32();
+	}
+	return pGut3DWndMgrWin32;
+}
+
+Gut3DWndMgrWin32::Gut3DWndMgrWin32()
+{
+	m_WndCount = 0;
+	m_ppWndBuff = new Gut3DWnd *[GUT_WND_MAXNUM];
+	memset(m_ppWndBuff, 0, sizeof(m_ppWndBuff[0]));
+}
+
+Gut3DWndMgrWin32::~Gut3DWndMgrWin32()
+{
+	if(m_ppWndBuff) for(int i = 0; i < m_WndCount; ++i) if(m_ppWndBuff[i]) delete m_ppWndBuff[i];
+	delete m_ppWndBuff;
+}
+
+#endif
+
+#if GUT_WIN32_OP
 
 static bool g_bMsgLoopActive = false;
 static HWND g_hWnd = NULL;
@@ -328,3 +354,4 @@ bool GutCreateWindow(int x, int y, int width, int height, const char *title)
 	g_bMsgLoopActive = true;
 	return true;
 }
+#endif

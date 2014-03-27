@@ -6,7 +6,7 @@
 #include <GL/gl.h>
 
 #include "Gut.h"
-#include "GutWin32.h"
+#include "GutWin32.hpp"
 #include "GutOpenGL.h"
 #include "GutFileUtility.h"
 

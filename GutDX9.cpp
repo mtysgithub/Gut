@@ -4,7 +4,7 @@
 #include <D3DX9.h>
 #include <stdio.h>
 
-#include "GutWin32.h"
+#include "GutWin32.hpp"
 #include "GutDX9.h"
 #include "Gut.h"
 

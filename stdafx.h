@@ -18,7 +18,7 @@
 using namespace std;
 
 // ∫Í∂®“Â
-#if WIN32
+#ifdef WIN32
 	#define _GUT_INTERFACE_ __interface
 #else
 	#define _GUT_INTERFACE_ class

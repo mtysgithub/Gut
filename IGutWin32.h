@@ -1,17 +1,12 @@
 #pragma once
 #include "stdafx.h"
+#include "GutWin32def.h"
 
 #if _GUT_WIN32_OO_
 
-enum GutWndMode
-{
-	GutWnd_Normal,
-	GutWnd_FullScreen
-};
-
 _GUT_INTERFACE_ IGut3DWndMgr
 {
-	virtual HRESULT CreateWnd(IN const char *pWndName, IN GutWndMode wndMod, OUT HWND *pWnd, OUT int &wndIdx) = 0;
+	virtual HRESULT CreateWnd(IN const char *pWndName, IN int _wndPosX, IN int _wndPosY, IN int _wndWidth, IN int _wndHeight, IN GutWndMode wndMod, OUT Gut3DWnd **ppGutWnd, OUT int &wndIdx) = 0;
 	virtual HRESULT CloseWnd(IN int wndIdx) = 0;
 	virtual HRESULT ProcMsg(IN int wndIdx) = 0;
 };

@@ -1,16 +1,24 @@
-#include <windows.h>
+#include "stdafx.h"
 #include "Gut.h"
+#include "GutWin32def.h"
 #include "GutWin32.hpp"
 
 #if _GUT_WIN32_OO_
 
-HRESULT IGutEx_Create_3DWnd(IN int _wndWidth, IN int _wndHeight, IN bool _bIsFullScreen, OUT HWND *_pWnd, OUT int &_wndIdx)
+HRESULT IGutEx_Create_3DWnd(IN const char *_wndName, IN int _wndPosX, IN int _wndPosY, IN int _wndWidth, IN int _wndHeight, IN bool _bIsFullScreen, OUT Gut3DWnd **_ppGutWnd, OUT int &_wndIdx)
 {
-	return E_FAIL;
+	if (!_bIsFullScreen)
+	{
+		return (Gut3DWndMgrWin32::Instance())->CreateWnd(_wndName, _wndPosX, _wndPosY, _wndWidth, _wndHeight, GutWndMode::GutWnd_Normal, _ppGutWnd, _wndIdx);
+	}else
+	{
+		return (Gut3DWndMgrWin32::Instance())->CreateWnd(_wndName, _wndPosX, _wndPosY, _wndWidth, _wndHeight, GutWndMode::GutWnd_FullScreen, _ppGutWnd, _wndIdx);
+	}
 }
 
 HRESULT IGutEx_Destroy_3DWnd(IN int _wndIdx)
 {
+	// TODO.
 	return E_FAIL;
 }
 
@@ -25,6 +33,11 @@ Gut3DWndMgrWin32 *Gut3DWndMgrWin32::Instance()
 
 Gut3DWndMgrWin32::Gut3DWndMgrWin32()
 {
+	m_DefaultWndPosX = 100;
+	m_DefaultWndPosY = 100;
+	m_DefaultWndWidth = 800;
+	m_DefaultWndHeight = 600;
+
 	m_WndCount = 0;
 	m_ppWndBuff = new Gut3DWnd *[GUT_WND_MAXNUM];
 	memset(m_ppWndBuff, 0, sizeof(m_ppWndBuff[0]));

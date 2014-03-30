@@ -38,7 +38,7 @@
     <Filter Include="IEx">
       <UniqueIdentifier>{c4c32257-fcb0-46db-8b8d-2b966c346d13}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Win32\interface">
+    <Filter Include="Win32\def">
       <UniqueIdentifier>{42e840ef-3a33-4d2b-91db-7872c51cf9d3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -290,9 +290,12 @@
       <Filter>Win32</Filter>
     </ClInclude>
     <ClInclude Include="IGutWin32.h">
-      <Filter>Win32\interface</Filter>
+      <Filter>Win32\def</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="GutWin32def.h">
+      <Filter>Win32\def</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="IExGlobal.def">

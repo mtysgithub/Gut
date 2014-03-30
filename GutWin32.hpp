@@ -1,61 +1,61 @@
 #pragma once
+
 #include "stdafx.h"
 #include "Gut.h"
+#include "GutWin32def.h"
 #include "IExWin32.h"
 #include "IGutWin32.h"
+
+#if _GUT_WIN32_OP_
+HWND GutGetWindowHandleWin32(void);
+void GutSetWindowHandleWin32(HWND hWnd);
+void GutCloseWindow(void);
+HINSTANCE GutGetWindowInstanceWin32(void);
+void GutGetWindowSize(int &w, int &h);
+#endif
+
 
 #if _GUT_WIN32_OO_
 
 #define GUT_WND_MAXNUM (1 << 8)
 
-extern HRESULT IGutEx_Create_3DWnd(IN int _wndWidth, IN int _wndHeight, IN bool _bIsFullScreen, OUT HWND *_pWnd, OUT int &_wndIdx);
-
-extern HRESULT IGutEx_Destroy_3DWnd(IN int _wndIdx);
-
 class Gut3DWndMgrWin32 : public IGut3DWndMgr
 {
-protected:
-	struct Gut3DWnd
-	{
-		Gut3DWnd(){memset(this, 0, sizeof(Gut3DWnd));}
-		bool m_bMsgLoopActive;
-		HWND m_hWnd;
-		HINSTANCE m_hInstance;
-		HANDLE m_ThreadHandle;
-		unsigned long m_ThreadID;
-	};
-
 public:
 	static Gut3DWndMgrWin32 *Instance();
 
 #pragma region IGut3DWndMgr
 
-	virtual HRESULT CreateWnd(IN const char *pWndName, IN GutWndMode wndMod, OUT HWND *pWnd, OUT int &wndIdx)
+	virtual HRESULT CreateWnd(IN const char *pWndName, IN int _wndPosX, IN int _wndPosY, IN int _wndWidth, IN int _wndHeight, IN GutWndMode wndMod, OUT Gut3DWnd **ppGutWnd, OUT int &wndIdx)
 	{
 		WNDCLASS window_class;
 		memset(&window_class, 0, sizeof(WNDCLASS));
 
 		window_class.style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
-		window_class.lpfnWndProc = WndMsgProc;
+		window_class.lpfnWndProc = __StaticWndMsgProc;
 		window_class.hInstance = GetModuleHandle(NULL);
 		window_class.hCursor = LoadCursor(NULL, IDC_ARROW);
 		window_class.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
+
+		/*http://bbs.csdn.net/topics/390631479?page=1*/
 		window_class.lpszClassName = _TEXT(pWndName);
+
 		RegisterClass(&window_class);
 
-		DWORD window_style;
-		if ( g_GutCallBack.OnSize )
-		{
-			window_style = WS_OVERLAPPEDWINDOW;
-		}
-		else
-		{
-			window_style = WS_BORDER | WS_SYSMENU;
-		}
+		DWORD window_style = WS_OVERLAPPEDWINDOW;
 
 		RECT window_rect;
-		SetRect(&window_rect, m_DefaultWndPosX, m_DefaultWndPosY, m_DefaultWndPosX + m_DefaultWndWidth, m_DefaultWndPosY + m__DefaultWndHeight);
+		if (0 <= _wndPosX && 0 <= _wndPosY &&  0 <= _wndWidth && 0 <= _wndHeight)
+		{
+			m_DefaultWndPosX = _wndPosX;
+			m_DefaultWndPosY = _wndPosY;
+			m_DefaultWndWidth = _wndWidth;
+			m_DefaultWndHeight = _wndHeight;
+		}
+		SetRect(&window_rect, m_DefaultWndPosX, m_DefaultWndPosY, m_DefaultWndPosX + m_DefaultWndWidth, m_DefaultWndPosY + m_DefaultWndHeight);
 		AdjustWindowRect(&window_rect, window_style, FALSE);
+
+		/*http://bbs.csdn.net/topics/100033541*/
 		HWND window_handle = CreateWindowEx(
 			WS_EX_APPWINDOW,
 			_TEXT(pWndName),
@@ -71,20 +71,27 @@ public:
 			NULL
 			);
 
-		if(!window_handle) return E_FAIL;
+		if(!window_handle)
+		{
+			int erroCodoc = GetLastError();
+			printf("CreateWindowEx => %d\n", erroCodoc);
+			return E_FAIL;
+		}
 
 		wndIdx = m_WndCount;
-		Gut3DWnd *pGutWnd = new Gut3DWnd();
+		Gut3DWnd *pTmpGutWnd = new Gut3DWnd();
 
-		pGutWnd->m_hWnd = window_handle;
-		pGutWnd->m_hInstance = window_class.hInstance;
-		pGutWnd->m_bMsgLoopActive = true;
-		m_ppWndBuff[m_WndCount++] = pGutWnd;
+		pTmpGutWnd->m_hWnd = window_handle;
+		pTmpGutWnd->m_hInstance = window_class.hInstance;
+		pTmpGutWnd->m_bMsgLoopActive = true;
+		m_ppWndBuff[m_WndCount++] = pTmpGutWnd;
 
-		*pWnd = pGutWnd->m_hWnd;
+		*ppGutWnd = pTmpGutWnd;
 
 		ShowWindow(window_handle, SW_SHOWNORMAL);
 		SetActiveWindow(window_handle);
+
+		return S_OK;
 	}
 
 	virtual HRESULT CloseWnd(IN int wndIdx)
@@ -101,12 +108,6 @@ public:
 
 #pragma endregion
 
-	static LRESULT WINAPI WndMsgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
-	{
-		//TODO.
-		return 0L;
-	}
-
 protected:
 
 private:
@@ -114,27 +115,49 @@ private:
 	Gut3DWndMgrWin32();
 	virtual ~Gut3DWndMgrWin32();
 
+	static LRESULT WINAPI __StaticWndMsgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+	{
+	switch (message)
+	{
+	case WM_DESTROY:
+		{
+
+			break;
+		}
+
+	case WM_SIZE:
+		{
+
+			break;
+		}
+
+	case WM_PAINT:
+		{
+
+			break;
+		}
+
+	default:
+		{
+			return DefWindowProc(hwnd, message, wParam, lParam);
+			break;
+		}
+	}
+
+	return 0;
+	}
+
 private:
 	Gut3DWnd **m_ppWndBuff;
 	int m_WndCount;
 	
-	static const int m_DefaultWndPosX = 0;
-	static const int m_DefaultWndPosY = 0;
+	int m_DefaultWndPosX;
+	int m_DefaultWndPosY;
 
-	static const int m_DefaultWndWidth = 800;
-	static const int m__DefaultWndHeight = 600;
+	int m_DefaultWndWidth;
+	int m_DefaultWndHeight;
 };
 
 extern Gut3DWndMgrWin32 *pGut3DWndMgrWin32;
-
-#endif
-
-#if _GUT_WIN32_OP_
-
-HWND GutGetWindowHandleWin32(void);
-void GutSetWindowHandleWin32(HWND hWnd);
-void GutCloseWindow(void);
-HINSTANCE GutGetWindowInstanceWin32(void);
-void GutGetWindowSize(int &w, int &h);
 
 #endif

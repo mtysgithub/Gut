@@ -89,7 +89,7 @@
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <PrecompiledHeader />
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <AdditionalIncludeDirectories>$(DXSDK_DIR)\Include</AdditionalIncludeDirectories>
@@ -110,6 +110,11 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <AdditionalIncludeDirectories>$(DXSDK_DIR)\Include</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
+      <OpenMPSupport>false</OpenMPSupport>
     </ClCompile>
     <Lib>
       <AdditionalLibraryDirectories>$(DXSDK_DIR)/Lib/x86</AdditionalLibraryDirectories>
@@ -164,6 +169,7 @@
     <ClCompile Include="GutTexture_DX9.cpp" />
     <ClCompile Include="Matrix4x4_Reference.cpp" />
     <ClCompile Include="Matrix4x4_SSE.cpp" />
+    <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="Vector4_Reference.cpp" />
     <ClCompile Include="Vector4_SSE.cpp" />
     <ClCompile Include="glew.c" />
@@ -208,6 +214,7 @@
     <ClInclude Include="Matrix4x4.h" />
     <ClInclude Include="Matrix4x4_Reference.h" />
     <ClInclude Include="Matrix4x4_SSE.h" />
+    <ClInclude Include="stdafx.h" />
     <ClInclude Include="Vector4.h" />
     <ClInclude Include="Vector4_Reference.h" />
     <ClInclude Include="Vector4_SSE.h" />

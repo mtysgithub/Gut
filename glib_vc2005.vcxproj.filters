@@ -154,6 +154,7 @@
     <ClCompile Include="GutFontUnicodeWin32.cpp">
       <Filter>Font</Filter>
     </ClCompile>
+    <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Gut.h">
@@ -291,6 +292,7 @@
     <ClInclude Include="IGutWin32.h">
       <Filter>Win32\interface</Filter>
     </ClInclude>
+    <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="IExGlobal.def">

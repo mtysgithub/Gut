@@ -2,7 +2,17 @@
 #include "Gut.h"
 #include "GutWin32.hpp"
 
-#if GUT_WIN32_OO
+#if _GUT_WIN32_OO_
+
+HRESULT IGutEx_Create_3DWnd(IN int _wndWidth, IN int _wndHeight, IN bool _bIsFullScreen, OUT HWND *_pWnd, OUT int &_wndIdx)
+{
+	return E_FAIL;
+}
+
+HRESULT IGutEx_Destroy_3DWnd(IN int _wndIdx)
+{
+	return E_FAIL;
+}
 
 Gut3DWndMgrWin32 *Gut3DWndMgrWin32::Instance()
 {
@@ -26,9 +36,11 @@ Gut3DWndMgrWin32::~Gut3DWndMgrWin32()
 	delete m_ppWndBuff;
 }
 
+Gut3DWndMgrWin32 *pGut3DWndMgrWin32 = NULL;
+
 #endif
 
-#if GUT_WIN32_OP
+#if _GUT_WIN32_OP_
 
 static bool g_bMsgLoopActive = false;
 static HWND g_hWnd = NULL;

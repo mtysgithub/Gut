@@ -5,19 +5,13 @@
 #include "IGutWin32.h"
 #include <windows.h>
 
-#if GUT_WIN32_OO
+#if _GUT_WIN32_OO_
 
-#define GUT_WND_MAXNUM 1 << 8
+#define GUT_WND_MAXNUM (1 << 8)
 
-HRESULT IGutEx_Create_3DWnd(IN int _wndWidth, IN int _wndHeight, IN bool _bIsFullScreen, OUT HWND *_pWnd, OUT int &_wndIdx)
-{
-	return E_FAIL;
-}
+extern HRESULT IGutEx_Create_3DWnd(IN int _wndWidth, IN int _wndHeight, IN bool _bIsFullScreen, OUT HWND *_pWnd, OUT int &_wndIdx);
 
-HRESULT IGutEx_Destroy_3DWnd(IN int _wndIdx)
-{
-	return E_FAIL;
-}
+extern HRESULT IGutEx_Destroy_3DWnd(IN int _wndIdx);
 
 class Gut3DWndMgrWin32 : public IGut3DWndMgr
 {
@@ -37,7 +31,7 @@ public:
 
 #pragma region IGut3DWndMgr
 
-	virtual HRESULT CreateWnd(IN const char *pWndName, IN GutWndMode wndMod, OUT HWND **ppWnd, OUT int &wndIdx)
+	virtual HRESULT CreateWnd(IN const char *pWndName, IN GutWndMode wndMod, OUT HWND *pWnd, OUT int &wndIdx)
 	{
 		WNDCLASS window_class;
 		memset(&window_class, 0, sizeof(WNDCLASS));
@@ -47,7 +41,7 @@ public:
 		window_class.hInstance = GetModuleHandle(NULL);
 		window_class.hCursor = LoadCursor(NULL, IDC_ARROW);
 		window_class.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
-		window_class.lpszClassName = pWndName;
+		window_class.lpszClassName = static_cast<LPCSTR>(pWndName);
 		RegisterClass(&window_class);
 
 		DWORD window_style;
@@ -65,8 +59,8 @@ public:
 		AdjustWindowRect(&window_rect, window_style, FALSE);
 		HWND window_handle = CreateWindowEx(
 			WS_EX_APPWINDOW,
-			pWndName,
-			pWndName,
+			static_cast<LPCSTR>(pWndName),
+			static_cast<LPCSTR>(pWndName),
 			window_style,
 			window_rect.left,
 			window_rect.top,
@@ -80,11 +74,15 @@ public:
 
 		if(!window_handle) return E_FAIL;
 
+		wndIdx = m_WndCount;
 		Gut3DWnd *pGutWnd = new Gut3DWnd();
+
 		pGutWnd->m_hWnd = window_handle;
 		pGutWnd->m_hInstance = window_class.hInstance;
 		pGutWnd->m_bMsgLoopActive = true;
 		m_ppWndBuff[m_WndCount++] = pGutWnd;
+
+		*pWnd = pGutWnd->m_hWnd;
 
 		ShowWindow(window_handle, SW_SHOWNORMAL);
 		SetActiveWindow(window_handle);
@@ -128,11 +126,11 @@ private:
 	static const int m__DefaultWndHeight = 600;
 };
 
-extern Gut3DWndMgrWin32 *pGut3DWndMgrWin32 = NULL;
+extern Gut3DWndMgrWin32 *pGut3DWndMgrWin32;
 
 #endif
 
-#if GUT_WIN32_OP
+#if _GUT_WIN32_OP_
 
 HWND GutGetWindowHandleWin32(void);
 void GutSetWindowHandleWin32(HWND hWnd);

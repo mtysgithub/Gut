@@ -1,10 +1,7 @@
 #ifndef _GUTIL_
 #define _GUTIL_
 
-#include <windows.h>
-#include <GL/gl.h>
-#include <d3d9.h>
-#include <string>
+#include "stdafx.h"
 
 #include "GutDefs.h"
 #include "GutMem.h"

@@ -1,9 +1,8 @@
 #pragma once
-
+#include "stdafx.h"
 #include "Gut.h"
 #include "IExWin32.h"
 #include "IGutWin32.h"
-#include <windows.h>
 
 #if _GUT_WIN32_OO_
 
@@ -41,7 +40,7 @@ public:
 		window_class.hInstance = GetModuleHandle(NULL);
 		window_class.hCursor = LoadCursor(NULL, IDC_ARROW);
 		window_class.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
-		window_class.lpszClassName = static_cast<LPCSTR>(pWndName);
+		window_class.lpszClassName = _TEXT(pWndName);
 		RegisterClass(&window_class);
 
 		DWORD window_style;
@@ -59,8 +58,8 @@ public:
 		AdjustWindowRect(&window_rect, window_style, FALSE);
 		HWND window_handle = CreateWindowEx(
 			WS_EX_APPWINDOW,
-			static_cast<LPCSTR>(pWndName),
-			static_cast<LPCSTR>(pWndName),
+			_TEXT(pWndName),
+			_TEXT(pWndName),
 			window_style,
 			window_rect.left,
 			window_rect.top,

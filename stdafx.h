@@ -9,9 +9,11 @@
 // Windows 头文件:
 #include <windows.h>
 
-
-
 // 在此处引用程序需要的其他头文件
+#include "TCHAR.H"
+#include <GL/gl.h>
+#include <d3d9.h>
+#include <string>
 #include <iostream>
 using namespace std;
 

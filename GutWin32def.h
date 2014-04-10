@@ -7,6 +7,7 @@ struct Gut3DWnd
 
 	bool m_bMsgLoopActive;
 	HWND m_hWnd;
+	WNDCLASS m_hWndClass;
 	HINSTANCE m_hInstance;
 	HANDLE m_ThreadHandle;
 	unsigned long m_ThreadID;

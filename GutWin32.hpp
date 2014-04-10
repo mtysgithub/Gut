@@ -82,6 +82,7 @@ public:
 		Gut3DWnd *pTmpGutWnd = new Gut3DWnd();
 
 		pTmpGutWnd->m_hWnd = window_handle;
+		pTmpGutWnd->m_hWndClass = window_class;
 		pTmpGutWnd->m_hInstance = window_class.hInstance;
 		pTmpGutWnd->m_bMsgLoopActive = true;
 		m_ppWndBuff[m_WndCount++] = pTmpGutWnd;

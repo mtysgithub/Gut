@@ -5,8 +5,9 @@ struct Gut3DWnd
 {
 	Gut3DWnd(){memset(this, 0, sizeof(Gut3DWnd));}
 
-	bool m_bMsgLoopActive;
+	int index;
 	HWND m_hWnd;
+	bool m_bMsgLoopActive;
 	WNDCLASS m_hWndClass;
 	HINSTANCE m_hInstance;
 	HANDLE m_ThreadHandle;
@@ -14,8 +15,14 @@ struct Gut3DWnd
 
 	void (*OnSize)(int x, int y);
 	void (*OnPaint)(void);
-	void (*OnIdle)(void);
 	void (*OnClose)(void);
+	void (*OnIdle)(void);
+
+	bool Active()
+	{
+		// `收到过销毁窗口消息的结构体，调用此函数会返回false来结束执行消息循环.`
+		return m_bMsgLoopActive;
+	}
 };
 
 enum GutWndMode

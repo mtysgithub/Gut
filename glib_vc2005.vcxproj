@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>glib</ProjectName>
+    <ProjectName>Gut</ProjectName>
     <ProjectGuid>{12323F50-B0EE-4582-9F73-41E67A5699A6}</ProjectGuid>
     <RootNamespace>glib</RootNamespace>
     <Keyword>Win32Proj</Keyword>

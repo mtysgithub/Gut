@@ -7,8 +7,7 @@
 _GUT_INTERFACE_ IGut3DWndMgr
 {
 	virtual HRESULT CreateWnd(IN const char *pWndName, IN int _wndPosX, IN int _wndPosY, IN int _wndWidth, IN int _wndHeight, IN GutWndMode wndMod, OUT Gut3DWnd **ppGutWnd, OUT int &wndIdx) = 0;
-	virtual HRESULT CloseWnd(IN int wndIdx) = 0;
-	virtual HRESULT ProcMsg(IN int wndIdx) = 0;
+	virtual HRESULT ReleaseWnd(IN int wndIdx) = 0;
 };
 
 #endif

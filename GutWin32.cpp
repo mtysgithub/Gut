@@ -18,8 +18,7 @@ HRESULT IGutEx_Create_3DWnd(IN const char *_wndName, IN int _wndPosX, IN int _wn
 
 HRESULT IGutEx_Destroy_3DWnd(IN int _wndIdx)
 {
-	// TODO.
-	return E_FAIL;
+	return (Gut3DWndMgrWin32::Instance())->ReleaseWnd(_wndIdx);
 }
 
 Gut3DWndMgrWin32 *Gut3DWndMgrWin32::Instance()
@@ -47,6 +46,22 @@ Gut3DWndMgrWin32::~Gut3DWndMgrWin32()
 {
 	if(m_ppWndBuff) for(int i = 0; i < m_WndCount; ++i) if(m_ppWndBuff[i]) delete m_ppWndBuff[i];
 	delete m_ppWndBuff;
+}
+
+Gut3DWnd *Gut3DWndMgrWin32::GetGutWnd(int wndIdx)
+{
+	return m_ppWndBuff[wndIdx];
+}
+Gut3DWnd *Gut3DWndMgrWin32::GetGutWnd(HWND hWnd)
+{
+	map<HWND, int>::iterator it = m_mapWnd2Index.find(hWnd);
+	if (m_mapWnd2Index.end() != it)
+	{
+		return m_ppWndBuff[it->second];
+	}else
+	{
+		return NULL;
+	}
 }
 
 Gut3DWndMgrWin32 *pGut3DWndMgrWin32 = NULL;
@@ -126,7 +141,7 @@ static LRESULT WINAPI WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
 			int h = HIWORD(lParam);
 			g_iWindowWidth = w;
 			g_iWindowHeight = h;
-			if ( g_GutCallBack.OnSize && GutGetGraphicsDeviceType()!=GUT_UNKNOWN ) 
+			if ( g_GutCallBack.OnSize && GutGetGraphicsDeviceType()!= GUT_UNKNOWN ) 
 			{
 				// `有设置窗口大小改变的处理函数的话, 就去调用它.`
 				g_GutCallBack.OnSize(w, h);
@@ -289,7 +304,7 @@ bool GutCreateWindow(int x, int y, int width, int height, const char *title)
 {
 	static bool registered = false;
 
-	WNDCLASS	window_class;
+	WNDCLASS window_class;
 
 	memset(&window_class, 0, sizeof(WNDCLASS));
 
